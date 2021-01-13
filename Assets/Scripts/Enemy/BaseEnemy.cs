@@ -9,14 +9,15 @@ public abstract class BaseEnemy : MonoBehaviour
 {
     [SerializeField]
     protected float health, moveSpeed, attackPower, maxIdleTime, 
-    maxPatrolTime, visionRange = 5f, attackRange = 1f;
+    maxPatrolTime, visionRange = 5f, attackRange = 1f, aggressiveRange = 35f;
     protected float currentIdleTime = 0f, currentPatrolTime = 0f, distanceToPlayer;
-    protected bool hasLineOfSight;
+    protected bool hasLineOfSight, isDead = false;
     protected Transform player;
     protected Vector2 movement;
-    private State enemyState = State.Idle;
     protected Rigidbody2D rb;
-    private Animator animator;
+    protected Animator animator;
+
+    private State enemyState = State.Idle;
     private Action currentStateMethod;
 
     protected enum State {
@@ -43,17 +44,19 @@ public abstract class BaseEnemy : MonoBehaviour
 
     private void Update()
     {
+        if (isDead) return;
         CheckLineOfSight();
         currentStateMethod();
     }
 
     private void CheckLineOfSight()
     {
+        distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
         RaycastHit2D raycast = Physics2D.Linecast(transform.position, player.transform.position);
+
         if (raycast)
         {
-            distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
-            if (distanceToPlayer < visionRange)
+            if (distanceToPlayer < visionRange && enemyState != State.Aggressive)
             {
                 ChangeState(State.Aggressive);
             }
@@ -87,7 +90,12 @@ public abstract class BaseEnemy : MonoBehaviour
     
     public void TakeDamage(float dmg)
     {
-
+        health -= dmg;
+        if (health <= 0f)
+        {
+            animator.SetTrigger("Die");
+            isDead = true;
+        }
     }
 
 

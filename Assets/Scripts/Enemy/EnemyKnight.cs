@@ -9,6 +9,7 @@ public class EnemyKnight : BaseEnemy
         if (distanceToPlayer <= attackRange)
         {
             movement = new Vector2(0f, rb.velocity.y);
+            animator.SetTrigger("Attack");
             return;
         }
 
@@ -16,7 +17,12 @@ public class EnemyKnight : BaseEnemy
         transform.localScale = new Vector3(     direction * Mathf.Abs(transform.localScale.x),
                                                 transform.localScale.y,
                                                 transform.localScale.z);
+
         movement = new Vector2(transform.localScale.x * moveSpeed, rb.velocity.y);
+        if (distanceToPlayer >= aggressiveRange)
+        {
+            ChangeState(State.Idle);
+        }
     }
 
     protected override void Idle()

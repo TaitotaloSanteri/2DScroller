@@ -133,6 +133,14 @@ public class PlayerController : MonoBehaviour
             isGrounded = false;
         }
     }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (isAttacking && collision && collision.gameObject.layer == 13)
+        {
+            BaseEnemy enemy = collision.GetComponentInParent<BaseEnemy>();
+            enemy.TakeDamage(5);
+        }
+    }
 }
 
 
