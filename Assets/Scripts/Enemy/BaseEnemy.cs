@@ -8,8 +8,11 @@ using System;
 public abstract class BaseEnemy : MonoBehaviour
 {
     [SerializeField]
-    protected float health, moveSpeed, attackPower, maxIdleTime, maxPatrolTime;
-    protected float currentIdleTime = 0f, currentPatrolTime = 0f;
+    protected float health, moveSpeed, attackPower, maxIdleTime, 
+    maxPatrolTime, visionRange = 5f, attackRange = 1f;
+    protected float currentIdleTime = 0f, currentPatrolTime = 0f, distanceToPlayer;
+    protected bool hasLineOfSight;
+    protected Transform player;
     protected Vector2 movement;
     private State enemyState = State.Idle;
     protected Rigidbody2D rb;
@@ -28,6 +31,11 @@ public abstract class BaseEnemy : MonoBehaviour
         animator = GetComponent<Animator>();
         currentStateMethod = Idle;
     }
+    private void Start()
+    {
+        player = GameObject.Find("Player").transform;
+    }
+
     private void FixedUpdate()
     {
         rb.velocity = movement;
@@ -35,8 +43,23 @@ public abstract class BaseEnemy : MonoBehaviour
 
     private void Update()
     {
+        CheckLineOfSight();
         currentStateMethod();
     }
+
+    private void CheckLineOfSight()
+    {
+        RaycastHit2D raycast = Physics2D.Linecast(transform.position, player.transform.position);
+        if (raycast)
+        {
+            distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
+            if (distanceToPlayer < visionRange)
+            {
+                ChangeState(State.Aggressive);
+            }
+        }
+    }
+
 
     protected abstract void Idle();
     protected abstract void Patrol();
@@ -49,12 +72,15 @@ public abstract class BaseEnemy : MonoBehaviour
         {
             case State.Aggressive:
                 currentStateMethod = Aggressive;
+                animator.SetBool("Walk", true);
                 break;
             case State.Patrol:
                 currentStateMethod = Patrol;
+                animator.SetBool("Walk", true);
                 break;
             default:
                 currentStateMethod = Idle;
+                animator.SetBool("Walk", false);
                 break;
         }
     }

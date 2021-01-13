@@ -6,7 +6,17 @@ public class EnemyKnight : BaseEnemy
 {
     protected override void Aggressive()
     {
-   
+        if (distanceToPlayer <= attackRange)
+        {
+            movement = new Vector2(0f, rb.velocity.y);
+            return;
+        }
+
+        float direction = Mathf.Sign(player.transform.position.x - transform.position.x);
+        transform.localScale = new Vector3(     direction * Mathf.Abs(transform.localScale.x),
+                                                transform.localScale.y,
+                                                transform.localScale.z);
+        movement = new Vector2(transform.localScale.x * moveSpeed, rb.velocity.y);
     }
 
     protected override void Idle()
@@ -34,3 +44,4 @@ public class EnemyKnight : BaseEnemy
         }
     }
 }
+
