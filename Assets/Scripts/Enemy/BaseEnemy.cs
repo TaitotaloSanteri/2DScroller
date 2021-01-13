@@ -5,12 +5,14 @@ using System;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Rigidbody2D))]
-public class BaseEnemy : MonoBehaviour
+public abstract class BaseEnemy : MonoBehaviour
 {
     [SerializeField]
-    protected float health, moveSpeed, attackPower;
+    protected float health, moveSpeed, attackPower, maxIdleTime, maxPatrolTime;
+    protected float currentIdleTime = 0f, currentPatrolTime = 0f;
+    protected Vector2 movement;
     private State enemyState = State.Idle;
-    private Rigidbody2D rb;
+    protected Rigidbody2D rb;
     private Animator animator;
     private Action currentStateMethod;
 
@@ -26,26 +28,19 @@ public class BaseEnemy : MonoBehaviour
         animator = GetComponent<Animator>();
         currentStateMethod = Idle;
     }
+    private void FixedUpdate()
+    {
+        rb.velocity = movement;
+    }
 
     private void Update()
     {
         currentStateMethod();
     }
 
-    protected virtual void Idle()
-    {
-
-    }
-
-    protected virtual void Patrol()
-    {
-
-    }
-
-    protected virtual void Aggressive()
-    {
-
-    }
+    protected abstract void Idle();
+    protected abstract void Patrol();
+    protected abstract void Aggressive();
 
     protected virtual void ChangeState(State newState)
     {
