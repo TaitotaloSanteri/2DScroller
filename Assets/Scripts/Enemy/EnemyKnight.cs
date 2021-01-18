@@ -25,6 +25,14 @@ public class EnemyKnight : BaseEnemy
         }
     }
 
+    protected override void Attack()
+    {
+    }
+
+    protected override void Die()
+    {
+    }
+
     protected override void Idle()
     {
         movement = new Vector2(0f, rb.velocity.y);

@@ -23,7 +23,9 @@ public abstract class BaseEnemy : MonoBehaviour
     protected enum State {
         Idle,       // Vihollinen hengaa paikoillaan
         Patrol,     // Vihollinen liikkuu, mutta ei ole huomannut pelaajaa
-        Aggressive  // Vihollinen on huomannut pelaajan
+        Aggressive,  // Vihollinen on huomannut pelaajan
+        Attack,
+        Die
     }
 
     private void Awake()
@@ -67,6 +69,9 @@ public abstract class BaseEnemy : MonoBehaviour
     protected abstract void Idle();
     protected abstract void Patrol();
     protected abstract void Aggressive();
+    protected abstract void Attack();
+    protected abstract void Die();
+
 
     protected virtual void ChangeState(State newState)
     {
