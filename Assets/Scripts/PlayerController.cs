@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField]
-    private float moveSpeed = 10f, jumpForce = 50f, maxHealth = 100f;
+    private float moveSpeed = 10f, jumpForce = 50f, maxHealth = 100f, damage = 5f;
     private float xMovement, xScale, currentHealth;
 
     private Rigidbody2D rb;
@@ -98,6 +98,7 @@ public class PlayerController : MonoBehaviour
     {
         currentHealth -= damage;
         UIManager.instance.UpdateHealthBar(currentHealth, maxHealth);
+        UIManager.instance.ShowDamageText(damage.ToString(), transform.position, Color.red);
     }
 
     private void HandleMovement()
@@ -133,14 +134,18 @@ public class PlayerController : MonoBehaviour
             isGrounded = false;
         }
     }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (isAttacking && collision && collision.gameObject.layer == 13)
+        if (isAttacking)
         {
             BaseEnemy enemy = collision.GetComponentInParent<BaseEnemy>();
-            enemy.TakeDamage(5);
+            enemy?.TakeDamage(damage);
+            
         }
     }
+
+
 }
 
 

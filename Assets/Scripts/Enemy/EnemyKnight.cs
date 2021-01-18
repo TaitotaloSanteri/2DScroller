@@ -9,7 +9,10 @@ public class EnemyKnight : BaseEnemy
         if (distanceToPlayer <= attackRange)
         {
             movement = new Vector2(0f, rb.velocity.y);
-            animator.SetTrigger("Attack");
+            if (canAttack)
+            {
+                ChangeState(State.Attack);
+            }
             return;
         }
 
@@ -27,10 +30,19 @@ public class EnemyKnight : BaseEnemy
 
     protected override void Attack()
     {
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        if (stateInfo.IsName("Attack") && stateInfo.normalizedTime >= 0.95f)
+        {
+            canAttack = false;
+            hasHitPlayer = false;
+            StartCoroutine(AttackTimer());
+            ChangeState(State.Aggressive);
+        }
     }
 
     protected override void Die()
     {
+        movement = new Vector2(0f, rb.velocity.y);
     }
 
     protected override void Idle()

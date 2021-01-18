@@ -1210,7 +1210,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.627
   m_Color: {r: 1, g: 0.56079274, b: 0.023584902, a: 1}
-  m_Intensity: 1.02
+  m_Intensity: 0.39
   m_LightVolumeOpacity: 0
   m_ApplyToSortingLayers: 00000000712a359499fe052b65d5b0265de04532c5fd37fc99e90abde55188f82d03087a
   m_LightCookieSprite: {fileID: 0}
@@ -1860,6 +1860,63 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &777934714
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 777934715}
+  - component: {fileID: 777934716}
+  m_Layer: 12
+  m_Name: EnemyWeapon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &777934715
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 777934714}
+  m_LocalRotation: {x: 0, y: 0, z: 0.100274906, w: 0.99495983}
+  m_LocalPosition: {x: 0.882, y: -0.714, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1396488413}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 11.51}
+--- !u!61 &777934716
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 777934714}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.109006345, y: -0.0059889667}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.64573157, y: 0.26131645}
+  m_EdgeRadius: 0
 --- !u!1 &788196375
 GameObject:
   m_ObjectHideFlags: 0
@@ -2708,7 +2765,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -2745,6 +2802,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4910959d92b4e2a4da03647f6818213c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damageTextPrefab: {fileID: 5154995059488819863, guid: 5263d5057b2a2f54484bec24f956b0e1,
+    type: 3}
   healthBar: {fileID: 450290952}
 --- !u!1 &1183462875
 GameObject:
@@ -3266,7 +3325,7 @@ CapsuleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -3440,8 +3499,13 @@ MonoBehaviour:
   maxIdleTime: 2
   maxPatrolTime: 3
   visionRange: 25
-  attackRange: 5
+  attackRange: 2.65
   aggressiveRange: 30
+  invulTime: 0.5
+  recoilX: 10000
+  recoilY: 2500
+  attackDelay: 1.14
+  attackMultiplier: 2
 --- !u!50 &1396488411
 Rigidbody2D:
   serializedVersion: 4
@@ -3454,7 +3518,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 10
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -3476,7 +3540,7 @@ Animator:
   m_Controller: {fileID: 22100000, guid: 98984a693ea65fc4a849a2f2a0f0c0e2, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
@@ -3494,6 +3558,7 @@ Transform:
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children:
   - {fileID: 1951268423}
+  - {fileID: 777934715}
   m_Father: {fileID: 0}
   m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3764,7 +3829,7 @@ EdgeCollider2D:
   m_GameObject: {fileID: 1426784304}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: b08016c3bd56fa744b645d37707b10b0, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -4332,6 +4397,7 @@ MonoBehaviour:
   moveSpeed: 10
   jumpForce: 1500
   maxHealth: 100
+  damage: 5
   rightAxe: {fileID: 764120780}
   leftAxe: {fileID: 1187570728}
   maxJumpTime: 0.2

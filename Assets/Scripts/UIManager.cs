@@ -6,11 +6,12 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     [SerializeField]
+    private DamageText damageTextPrefab;
+
+    [SerializeField]
     private Image healthBar;
     private float startHealth = 0f;
     public static UIManager instance;
-
-    [SerializeField]
 
     private void Awake()
     {
@@ -18,6 +19,13 @@ public class UIManager : MonoBehaviour
         {
             instance = this;
         }
+    }
+
+    public void ShowDamageText(string text, Vector2 location, Color color)
+    {
+        DamageText damageTextInstance = Instantiate(damageTextPrefab, location, Quaternion.identity);
+        damageTextInstance.text.text = text;
+        damageTextInstance.text.color = color;
     }
 
     public void UpdateHealthBar(float currentHealth, float maxHealth)

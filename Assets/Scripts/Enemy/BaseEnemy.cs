@@ -9,14 +9,16 @@ public abstract class BaseEnemy : MonoBehaviour
 {
     [SerializeField]
     protected float health, moveSpeed, attackPower, maxIdleTime, 
-    maxPatrolTime, visionRange = 5f, attackRange = 1f, aggressiveRange = 35f;
+    maxPatrolTime, visionRange = 5f, attackRange = 1f, aggressiveRange = 35f, invulTime = 0.5f,
+    recoilX, recoilY, attackDelay = 0.3f, attackMultiplier = 2f;
     protected float currentIdleTime = 0f, currentPatrolTime = 0f, distanceToPlayer;
-    protected bool hasLineOfSight, isDead = false;
+    protected bool hasLineOfSight, invul, hasHitPlayer, canAttack = true;
     protected Transform player;
     protected Vector2 movement;
     protected Rigidbody2D rb;
     protected Animator animator;
 
+    private Collider2D[] colliders;
     private State enemyState = State.Idle;
     private Action currentStateMethod;
 
@@ -33,6 +35,8 @@ public abstract class BaseEnemy : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         currentStateMethod = Idle;
+        colliders = GetComponentsInChildren<Collider2D>();
+        animator.SetFloat("AttackMultiplier", attackMultiplier);
     }
     private void Start()
     {
@@ -46,8 +50,10 @@ public abstract class BaseEnemy : MonoBehaviour
 
     private void Update()
     {
-        if (isDead) return;
-        CheckLineOfSight();
+        if (enemyState != State.Die && enemyState != State.Attack)
+        {
+            CheckLineOfSight();
+        }
         currentStateMethod();
     }
 
@@ -82,10 +88,28 @@ public abstract class BaseEnemy : MonoBehaviour
                 currentStateMethod = Aggressive;
                 animator.SetBool("Walk", true);
                 break;
+
             case State.Patrol:
                 currentStateMethod = Patrol;
                 animator.SetBool("Walk", true);
                 break;
+
+            case State.Attack:
+                currentStateMethod = Attack;
+                animator.SetTrigger("Attack");
+                break;
+
+            case State.Die:
+                currentStateMethod = Die;
+                animator.ResetTrigger("Attack");
+                animator.SetTrigger("Die");
+                rb.isKinematic = true;
+                foreach (Collider2D col in colliders)
+                {
+                    col.enabled = false;
+                }
+                break;
+
             default:
                 currentStateMethod = Idle;
                 animator.SetBool("Walk", false);
@@ -95,13 +119,42 @@ public abstract class BaseEnemy : MonoBehaviour
     
     public void TakeDamage(float dmg)
     {
+        if (invul) return;
+
+        UIManager.instance.ShowDamageText(dmg.ToString(), transform.position, Color.green);
         health -= dmg;
+        invul = true;
+        StartCoroutine(InvulTimer());
+        //Vector2 force = -transform.localScale.x * Vector2.right * recoilX + Vector2.up * recoilY;
+        //rb.AddForce(force);
+        animator.ResetTrigger("Attack");
+        animator.SetTrigger("GetHit");
         if (health <= 0f)
         {
-            animator.SetTrigger("Die");
-            isDead = true;
+            ChangeState(State.Die);
         }
     }
 
+    private IEnumerator InvulTimer()
+    {
+        yield return new WaitForSeconds(invulTime);
+        invul = false;
+    }
+
+    protected IEnumerator AttackTimer()
+    {
+        yield return new WaitForSeconds(attackDelay);
+        canAttack = true;
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        
+        if (!hasHitPlayer && enemyState == State.Attack && collision.gameObject.layer == 10)
+        {
+            hasHitPlayer = true;
+            player.GetComponent<PlayerController>().TakeDamage(attackPower);
+        }
+    }
 
 }
