@@ -21,6 +21,11 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void OnPause()
+    {
+        Time.timeScale = 0f;
+    }
+
     public void ShowDamageText(string text, Vector2 location, Color color)
     {
         DamageText damageTextInstance = Instantiate(damageTextPrefab, location, Quaternion.identity);

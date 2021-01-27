@@ -50,11 +50,11 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            TakeDamage(10);
+            UIManager.instance.OnPause();
         }
-        
+
         HandleMovement();
         HandleJump();
         HandleAttack();
