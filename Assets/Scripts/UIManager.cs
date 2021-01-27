@@ -1,12 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     [SerializeField]
     private DamageText damageTextPrefab;
+
+    [SerializeField]
+    private GameObject pausePanel;
 
     [SerializeField]
     private Image healthBar;
@@ -21,9 +25,34 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void OnRestartButtonPressed()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("SampleScene");
+    }
+    public void OnMainMenuButtonPressed()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public void OnQuitGameButtonPressed()
+    {
+        Application.Quit();
+    }
     public void OnPause()
     {
-        Time.timeScale = 0f;
+        pausePanel.SetActive(!pausePanel.activeSelf);
+
+        if (pausePanel.active)
+        {
+            Time.timeScale = 0f;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
+
     }
 
     public void ShowDamageText(string text, Vector2 location, Color color)
@@ -43,7 +72,7 @@ public class UIManager : MonoBehaviour
     private IEnumerator SmoothBar(float currentHealth, float maxHealth)
     {
         Vector2 a = new Vector2(currentHealth, maxHealth);
-      
+
         while (startHealth > currentHealth)
         {
             startHealth -= (startHealth - currentHealth) * 0.025f;

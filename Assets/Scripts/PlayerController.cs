@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -99,6 +100,11 @@ public class PlayerController : MonoBehaviour
         currentHealth -= damage;
         UIManager.instance.UpdateHealthBar(currentHealth, maxHealth);
         UIManager.instance.ShowDamageText(damage.ToString(), transform.position, Color.red);
+        
+        if (currentHealth <= 0f)
+        {
+            SceneManager.LoadScene("SampleScene");
+        }
     }
 
     private void HandleMovement()
