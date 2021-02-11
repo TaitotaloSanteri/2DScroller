@@ -9,14 +9,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float moveSpeed = 10f, jumpForce = 50f, maxHealth = 100f, damage = 5f;
     private float xMovement, xScale, currentHealth;
+    [SerializeField]
+    private Transform ledgeCheck, spaceCheck;
 
     private Rigidbody2D rb;
     private Animator animator;
     [SerializeField]
     private SpriteRenderer rightAxe, leftAxe;
-
-    private bool isAttacking;
-
+    private int groundLayerMask;
+    private bool isAttacking, isHanging, isClimbing;
+    private Vector2 climbTarget;
     // Hyppyyn liittyvät muuttujat
     private bool isJumpButtonPressed, isGrounded, canJump, isJumping;
     private float currentAirTime = 0f;
@@ -26,6 +28,9 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        // Asetetaan groundLayerMask vastaamaan Default layeriä. Tätä tarvitaan
+        // ledgeCheckiä varten.
+        groundLayerMask = LayerMask.GetMask("Default");
         currentHealth = maxHealth;
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
@@ -56,9 +61,39 @@ public class PlayerController : MonoBehaviour
             UIManager.instance.OnPause();
         }
 
-        HandleMovement();
+        if (!isHanging)
+        {
+            HandleMovement();
+        }
+        else
+        {
+            HandleClimbing();
+        }
         HandleJump();
         HandleAttack();
+    }
+
+    private void HandleClimbing()
+    {
+        if (isClimbing)
+        {
+            rb.position = Vector2.MoveTowards(rb.position, climbTarget, moveSpeed * 2f * Time.deltaTime);
+            if (rb.position == climbTarget)
+            {
+                isClimbing = false;
+                isHanging = false;
+                rb.isKinematic = false;
+                animator.ResetTrigger("Hang");
+                animator.SetTrigger("StopHang");
+            }
+            return;
+        }
+
+        rb.velocity = Vector2.zero;
+        if (Input.GetAxisRaw("Vertical") > 0f)
+        {
+            isClimbing = true;
+        }
     }
 
     private void HandleAttack()
@@ -75,6 +110,35 @@ public class PlayerController : MonoBehaviour
 
     private void HandleJump()
     {
+        if (isHanging)
+        {
+            return;
+        }
+
+        if (!isHanging)
+        {
+            // Tarkistetaan LedgeCheck ja SpaceChecking osumat. Käyetään groundLayerMask
+            // muuttujaa siihen, että testataan osumat vain Default layerissä olevia
+            // collidereja vastaan.
+            Collider2D isLedgeCheck = Physics2D.OverlapCircle(ledgeCheck.position, 0.2f, groundLayerMask);
+            bool isSpaceCheck = Physics2D.OverlapCircle(spaceCheck.position, 0.2f, groundLayerMask);
+            bool isOnLedge = isLedgeCheck && !isSpaceCheck;
+            if (isOnLedge)
+            {
+                isHanging = true;
+                animator.SetBool("Jump", false);
+                animator.SetTrigger("Hang");
+                rb.velocity = Vector2.zero;
+                rb.isKinematic = true;
+                xMovement = 0f;
+                Vector2 horizontalOffset = Mathf.Sign(transform.localScale.x) * Vector2.right * 0.5f;
+                Vector2 hangingPosition = isLedgeCheck.ClosestPoint(ledgeCheck.position);
+                rb.position = hangingPosition + Vector2.down * 2f - horizontalOffset;
+                climbTarget = hangingPosition + Vector2.up * 2f + horizontalOffset;
+                return;
+            }
+        }
+
         isJumpButtonPressed = Input.GetAxisRaw("Jump") > 0f;
         if (isJumpButtonPressed && canJump)
         {
