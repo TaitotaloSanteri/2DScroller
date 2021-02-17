@@ -11,9 +11,9 @@ public class PlayerController : MonoBehaviour
     private float xMovement, xScale, currentHealth;
     [SerializeField]
     private Transform ledgeCheck, spaceCheck;
-
     private Rigidbody2D rb;
     private Animator animator;
+    private static Vector3 currentCheckpoint = Vector3.zero;
     [SerializeField]
     private SpriteRenderer rightAxe, leftAxe;
     private int groundLayerMask;
@@ -28,6 +28,8 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        transform.position = currentCheckpoint == Vector3.zero ? transform.position : currentCheckpoint;
+        
         // Asetetaan groundLayerMask vastaamaan Default layeriä. Tätä tarvitaan
         // ledgeCheckiä varten.
         groundLayerMask = LayerMask.GetMask("Default");
@@ -207,11 +209,15 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.CompareTag("Checkpoint"))
+        {
+            currentCheckpoint = collision.transform.position;
+        }
+
         if (isAttacking)
         {
             BaseEnemy enemy = collision.GetComponentInParent<BaseEnemy>();
             enemy?.TakeDamage(damage);
-            
         }
     }
 
